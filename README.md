@@ -35,3 +35,6 @@ https://github.com/ollama/ollama/blob/main/docs%2Ffaq.md
 OLLAMA_HOST should be the IP of your windows machine, and it will be available on your local network.
 
 Note: set system variables, not user environment variables (bottom box).
+
+# Misc
+https://github.com/f/awesome-chatgpt-prompts
