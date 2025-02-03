@@ -38,3 +38,4 @@ Note: set system variables, not user environment variables (bottom box).
 
 # Misc
 https://github.com/f/awesome-chatgpt-prompts
+https://www.continue.dev/
