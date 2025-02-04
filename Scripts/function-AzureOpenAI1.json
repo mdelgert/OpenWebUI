@@ -1,0 +1,34 @@
+[{
+    "id": "0a6b6de3-70af-4246-95ac-d335c3a10e3c",
+    "userId": "3e79b225-9756-4604-8ec6-25400af0e407",
+    "function": {
+        "id": "azure",
+        "name": "Azure OpenAI",
+        "meta": {
+            "description": "Pipe to connect with Azure OpenAI models",
+            "manifest": {
+                "title": "Azure OpenAI Pipe",
+                "author": "open-webui, adapted by nomppy",
+                "author_url": "https://github.com/open-webui",
+                "funding_url": "https://github.com/open-webui",
+                "version": "0.1.0",
+                "license": "MIT"
+            },
+            "type": "pipe"
+        },
+        "content": "\"\"\"\ntitle: Azure OpenAI Pipe\nauthor: open-webui, adapted by nomppy\nauthor_url: https://github.com/open-webui\nfunding_url: https://github.com/open-webui\nversion: 0.1.0\nlicense: MIT\n\"\"\"\n\nfrom typing import List, Union, Generator, Iterator\nfrom pydantic import BaseModel\nimport requests\nimport os\n\n\nclass Pipe:\n    class Valves(BaseModel):\n        # You can add your custom valves here.\n        AZURE_OPENAI_API_KEY: str = os.getenv(\"AZURE_OPENAI_API_KEY_GPT\", \"API_KEY\")\n        AZURE_OPENAI_ENDPOINT: str = os.getenv(\n            \"AZURE_OPENAI_ENDPOINT_GPT\", \"API_ENDPOINT\"\n        )\n        AZURE_OPENAI_DEPLOYMENT_NAME: str = os.getenv(\n            \"AZURE_OPENAI_DEPLOYMENT_NAME_GPT\", \"DEPLOYMENT_NAME\"\n        )\n        AZURE_OPENAI_API_VERSION: str = os.getenv(\n            \"AZURE_OPENAI_API_VERSION_GPT\", \"API_VERSION\"\n        )\n\n    def __init__(self):\n        # Optionally, you can set the id and name of the pipeline.\n        # Best practice is to not specify the id so that it can be automatically inferred from the filename, so that users can install multiple versions of the same pipeline.\n        # The identifier must be unique across all pipelines.\n        # The identifier must be an alphanumeric string that can include underscores or hyphens. It cannot contain spaces, special characters, slashes, or backslashes.\n        # self.id = \"azure_openai_pipeline\"\n        self.name = \"Azure OpenAI Pipe\"\n        self.valves = self.Valves()\n        pass\n\n    async def on_startup(self):\n        # This function is called when the server is started.\n        print(f\"on_startup:{__name__}\")\n        pass\n\n    async def on_shutdown(self):\n        # This function is called when the server is stopped.\n        print(f\"on_shutdown:{__name__}\")\n        pass\n\n    def pipe(self, body: dict) -> Union[str, Generator, Iterator]:\n        # This is where you can add your custom pipelines like RAG.\n        print(f\"pipe:{__name__}\")\n\n        headers = {\n            \"api-key\": self.valves.AZURE_OPENAI_API_KEY,\n            \"Content-Type\": \"application/json\",\n        }\n\n        url = f\"{self.valves.AZURE_OPENAI_ENDPOINT}/openai/deployments/{self.valves.AZURE_OPENAI_DEPLOYMENT_NAME}/chat/completions?api-version={self.valves.AZURE_OPENAI_API_VERSION}\"\n\n        allowed_params = {\n            \"messages\",\n            \"temperature\",\n            \"role\",\n            \"content\",\n            \"contentPart\",\n            \"contentPartImage\",\n            \"enhancements\",\n            \"dataSources\",\n            \"n\",\n            \"stream\",\n            \"stop\",\n            \"max_tokens\",\n            \"presence_penalty\",\n            \"frequency_penalty\",\n            \"logit_bias\",\n            \"user\",\n            \"function_call\",\n            \"funcions\",\n            \"tools\",\n            \"tool_choice\",\n            \"top_p\",\n            \"log_probs\",\n            \"top_logprobs\",\n            \"response_format\",\n            \"seed\",\n        }\n        # remap user field\n        if \"user\" in body and not isinstance(body[\"user\"], str):\n            body[\"user\"] = (\n                body[\"user\"][\"id\"] if \"id\" in body[\"user\"] else str(body[\"user\"])\n            )\n        filtered_body = {k: v for k, v in body.items() if k in allowed_params}\n        # log fields that were filtered out as a single line\n        if len(body) != len(filtered_body):\n            print(\n                f\"Dropped params: {', '.join(set(body.keys()) - set(filtered_body.keys()))}\"\n            )\n\n        try:\n            r = requests.post(\n                url=url,\n                json=filtered_body,\n                headers=headers,\n                stream=True,\n            )\n\n            r.raise_for_status()\n            if body[\"stream\"]:\n                return r.iter_lines()\n            else:\n                return r.json()\n        except Exception as e:\n            print(\"Requests error in Azure pipeline\")\n            if r:\n                text = r.text\n                return f\"Error: {e} ({text})\"\n            else:\n                return f\"Error: {e}\"\n"
+    },
+    "downloads": 1275,
+    "upvotes": 0,
+    "downvotes": 0,
+    "updatedAt": 1723490307,
+    "createdAt": 1723490083,
+    "user": {
+        "id": "3e79b225-9756-4604-8ec6-25400af0e407",
+        "username": "nomppy",
+        "name": "",
+        "profileImageUrl": "https://www.gravatar.com/avatar/6f9271e54c21b42fcfab2c7dc5a5d445148d42d0ffc92c980356698c2cd02662?d=mp",
+        "createdAt": 1719239908
+    }
+}
+]
