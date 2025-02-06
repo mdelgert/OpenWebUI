@@ -1,0 +1,21 @@
+@baseUrl = {{BASE_URL}}
+@apiKey = {{API_KEY}}
+@apiVersion = 2024-08-01-preview
+
+# @model = gpt-4o-mini
+# @model = gpt-4o
+@model = gpt-35-turbo
+
+### send message
+POST {{baseUrl}}openai/deployments/{{model}}/chat/completions?api-version={{apiVersion}}
+Content-Type: application/json
+api-key: {{apiKey}}
+
+{
+  "messages": [
+    { "role": "system", "content": "You are an AI assistant." },
+    { "role": "user", "content": "How to post to an endpoint in C#?" }
+  ],
+  "temperature": 0.7,
+  "max_tokens": 100
+}

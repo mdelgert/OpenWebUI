@@ -1,0 +1,14 @@
+"rest-client.environmentVariables": {
+    "$shared": {
+        "BASE_URL": "https://example.com",
+        "API_KEY": "youtoken"
+    },
+    "local": {
+        "BASE_URL": "https://localhost:11434",
+        "API_KEY": ""
+    },
+    "production": {
+        "BASE_URL": "https://example.com",
+        "API_KEY": "youtoken"
+    }
+}
